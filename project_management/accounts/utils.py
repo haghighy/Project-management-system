@@ -34,3 +34,19 @@ def activation_mail(user):
     }
 
     return send_mail_data
+
+def reset_password_mail(user):
+    """
+    Generates email data for password reset with a secure link.
+    """
+    mail_subject = "Reset Your Password"
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+    token = default_token_generator.make_token(user)
+
+    reset_link = f"{settings.BASE_BACKEND_URL}/api/accounts/password-reset/{uid}/{token}/"
+
+    return {
+        "mail_subject": mail_subject,
+        "mail_body": f"Click the link to reset your password:\n{reset_link}",
+        "to_email": user.email_address,
+    }

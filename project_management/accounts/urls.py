@@ -10,4 +10,8 @@ urlpatterns = [
     #login
     path("login/", views.MyTokenObtainPairView.as_view(), name="token-obtain-pair"),
     path("refresh/", TokenRefreshView.as_view(), name="token-refresh"),
+    #reset password
+    path('password-reset/request/', views.RequestResetPasswordAPIView.as_view(), name='password_reset_request'),
+    path('password-reset/<uidb64>/<token>/', views.CheckResetPasswordTokenAPIView.as_view(), name='password_reset_validate'),
+    path('password-reset/confirm/', views.ResetPasswordAPIView.as_view(), name='password_reset_confirm'),
 ]
