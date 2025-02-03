@@ -12,6 +12,6 @@ urlpatterns = [
     path('delete-closed/<int:board_id>/', views.DeleteClosedBoardAPIView.as_view(), name='delete-closed-board'),
     path('create-share-link/<int:board_id>/', views.CreateShareLinkAPIView.as_view(), name='create-share-link'),
     path('remove-share-link/<int:board_id>/', views.RemoveShareLinkAPIView.as_view(), name='remove-share-link'),
-    path('add-label/<int:board_id>/', views.AddBoardLabelAPIView.as_view(), name='add-board-label'),
+    path('add-label/', views.AddBoardLabelAPIView.as_view(), name='add-board-label'),
     path('remove-label/<int:board_id>/<int:label_id>/', views.RemoveBoardLabelAPIView.as_view(), name='remove-board-label'),
 ]

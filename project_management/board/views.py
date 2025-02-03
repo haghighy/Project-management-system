@@ -10,14 +10,13 @@ class CreateBoardAPIView(APIView):
     """
     Create a new board.
     """
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     serializer_class = BoardSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            # Ensure that the member_creator is set to the current logged-in user
-            serializer.save(member_creator=request.user)
+            serializer.save()
             return Response({"message": "Board created successfully."}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -154,10 +153,9 @@ class AddBoardLabelAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        board = Board.objects.get(id=kwargs["board_id"])
         label_serializer = BoardLabelSerializer(data=request.data)
         if label_serializer.is_valid():
-            label_serializer.save(board=board)
+            label_serializer.save()
             return Response({"message": "Board label added successfully."}, status=status.HTTP_201_CREATED)
         return Response(label_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
