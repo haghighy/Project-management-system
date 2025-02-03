@@ -3,7 +3,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework_simplejwt.views import TokenObtainPairView
 
@@ -12,6 +12,7 @@ from .serializers import (
     MyTokenObtainPairSerializer, 
     RequestResetPasswordSerializer,
     ResetPasswordSerializer,
+    UserProfileSerializer,
 )
 from .utils import activation_mail, reset_password_mail, Util
 
@@ -130,4 +131,37 @@ class ResetPasswordAPIView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "Password reset successfully."}, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class RetrieveUserProfileAPIView(APIView):
+    """
+    Retrieve the authenticated user's profile information.
+    """
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserProfileSerializer
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        serializer = self.serializer_class(user)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class UpdateUserProfileAPIView(APIView):
+    """
+    Update the authenticated user's profile details.
+    """
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = UserProfileSerializer
+
+    def patch(self, request, *args, **kwargs):
+        user = request.user
+        serializer = self.serializer_class(user, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

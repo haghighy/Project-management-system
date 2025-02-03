@@ -6,6 +6,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.password_validation import validate_password as django_validate_password
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
+from .models import Member
 
 User = get_user_model()
 
@@ -128,3 +129,35 @@ class ResetPasswordSerializer(serializers.Serializer):
         user.set_password(self.validated_data["password"])
         user.save()
         return user
+
+class UserProfileSerializer(serializers.ModelSerializer):
+    """
+    Serializer for retrieving and updating user profile details.
+    """
+    full_name = serializers.CharField(source='profile.full_name', read_only=True)
+    bio = serializers.CharField(source='profile.bio', allow_blank=True, required=False)
+    avatar_url = serializers.URLField(source='profile.avatar_url', allow_blank=True, required=False)
+    full_name_privacy = serializers.BooleanField(source='profile.full_name_privacy', required=False)
+    job_title = serializers.CharField(source='profile.job_title', allow_blank=True, required=False)
+
+    class Meta:
+        model = User
+        fields = ['email_address', 'username', 'first_name', 'last_name', 'full_name', 'bio', 'avatar_url', 'full_name_privacy', 'job_title']
+        read_only_fields = ['email_address']
+
+    def update(self, instance, validated_data):
+        user_fields = ['username', 'first_name', 'last_name']
+        for field in user_fields:
+            if field in validated_data:
+                setattr(instance, field, validated_data[field])
+
+        profile_data = validated_data.get('profile', {})
+        member = instance.profile
+        member_fields = ['bio', 'avatar_url', 'full_name_privacy', 'job_title']
+        for field in member_fields:
+            if field in profile_data:
+                setattr(member, field, profile_data[field])
+
+        instance.save()
+        member.save()
+        return instance

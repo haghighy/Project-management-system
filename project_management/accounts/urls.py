@@ -14,4 +14,7 @@ urlpatterns = [
     path('password-reset/request/', views.RequestResetPasswordAPIView.as_view(), name='password_reset_request'),
     path('password-reset/<uidb64>/<token>/', views.CheckResetPasswordTokenAPIView.as_view(), name='password_reset_validate'),
     path('password-reset/confirm/', views.ResetPasswordAPIView.as_view(), name='password_reset_confirm'),
+    #profile
+    path('profile/', views.RetrieveUserProfileAPIView.as_view(), name='get-profile'),
+    path('profile/update/', views.UpdateUserProfileAPIView.as_view(), name='update-profile'),
 ]
