@@ -3,7 +3,7 @@ from . import views
 
 urlpatterns = [
     path('create/', views.CreateBoardAPIView.as_view(), name='create-board'),
-    path('change/<int:board_id>/', views.ChangeBoardAPIView.as_view(), name='change-board'),
+    path('change/<str:board_id>/', views.ChangeBoardAPIView.as_view(), name='change-board'),
     path('add-member/<int:board_id>/', views.AddMemberToBoardAPIView.as_view(), name='add-member'),
     path('remove-member/<int:board_id>/', views.RemoveMemberFromBoardAPIView.as_view(), name='remove-member'),
     path('change-member-type/<int:board_id>/', views.ChangeMemberTypeAPIView.as_view(), name='change-member-type'),

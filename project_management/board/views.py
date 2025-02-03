@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Board, BoardMember, BoardLabel
 from .serializers import BoardSerializer, BoardLabelSerializer, BoardMemberSerializer
+from accounts.models import Member
 
 
 class CreateBoardAPIView(APIView):
@@ -29,8 +30,9 @@ class ChangeBoardAPIView(APIView):
     serializer_class = BoardSerializer
 
     def put(self, request, *args, **kwargs):
-        board = Board.objects.get(id=kwargs["board_id"], member_creator=request.user)
-        serializer = self.serializer_class(board, data=request.data)
+        user_id = request.user.id
+        board = Board.objects.get(id=kwargs["board_id"], member_creator__user__id=user_id)
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response({"message": "Board updated successfully."}, status=status.HTTP_200_OK)
