@@ -1,6 +1,7 @@
 from django.utils.http import urlsafe_base64_decode
 from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -14,6 +15,7 @@ from .serializers import (
     ResetPasswordSerializer,
     UserProfileSerializer,
     ChangePasswordSerializer,
+    ChangeEmailSerializer
 )
 from .utils import activation_mail, reset_password_mail, Util
 
@@ -219,3 +221,22 @@ class ChangePasswordAPIView(APIView):
             return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+class ChangeEmailAPIView(APIView):
+    """
+    This endpoint allows users to confirm their email change by verifying the token.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        new_email = request.data.get("new_email")
+        try:
+            user = User.objects.get(id = request.user.id)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            return Response({"error": "Invalid activation link."}, status=status.HTTP_400_BAD_REQUEST)
+        user.email_address = new_email
+        user.profile.email_verified = True
+        user.save()
+        return Response({"message": "Email updated successfully."}, status=status.HTTP_200_OK)

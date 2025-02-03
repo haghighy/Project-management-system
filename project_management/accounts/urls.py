@@ -20,4 +20,6 @@ urlpatterns = [
     path('profile/update/', views.UpdateUserProfileAPIView.as_view(), name='update-profile'),
     #change password
     path('change-password/', views.ChangePasswordAPIView.as_view(), name='change-password'),
+    path('change-email/', views.ChangeEmailAPIView.as_view(), name='change-email'),
+    # path('confirm-email-change/<uidb64>/<token>/', views.ConfirmEmailChangeAPIView.as_view(), name='confirm-email-change'),
 ]

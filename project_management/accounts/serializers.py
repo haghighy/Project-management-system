@@ -211,3 +211,25 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError({"new_password2": "New passwords must match."})
 
         return data
+    
+class ChangeEmailSerializer(serializers.Serializer):
+    """
+    Serializer to handle changing email address.
+    """
+    new_email = serializers.EmailField(required=True)
+    confirm_new_email = serializers.EmailField(required=True)
+
+    def validate(self, attrs):
+        new_email = attrs.get("new_email")
+        confirm_new_email = attrs.get("confirm_new_email")
+
+        if new_email != confirm_new_email:
+            raise ValidationError("Email addresses must match.")
+        
+        if new_email == self.context['request'].user.email_address:
+            raise ValidationError("The new email must be different from the current email address.")
+
+        if User.objects.filter(email_address=new_email).exists():
+            raise ValidationError("This email address is already in use.")
+
+        return attrs
