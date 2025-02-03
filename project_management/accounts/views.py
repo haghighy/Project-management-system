@@ -82,6 +82,34 @@ class MyTokenObtainPairView(TokenObtainPairView):
 
     serializer_class = MyTokenObtainPairSerializer
 
+class SendActivationEmailAPIView(APIView):
+    """
+    This endpoint allows users to request a verification email by providing their email address.
+    """
+
+    permission_classes = [AllowAny]
+
+    def post(self, request, *args, **kwargs):
+        email_address = request.data.get("email_address") 
+        
+        if not email_address:
+            return Response({"error": "Email is required."}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            user = User.objects.get(email_address=email_address)
+            
+            if user.profile.email_verified:
+                return Response({"message": "Email is already verified."}, status=status.HTTP_400_BAD_REQUEST)
+
+            data = activation_mail(user)
+            Util.send_email(data)
+            return Response({"message": "Activation mail sent successfully."}, status=status.HTTP_200_OK)
+        
+        except User.DoesNotExist:
+            return Response({"error": "No user found with this email."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class RequestResetPasswordAPIView(APIView):
     """

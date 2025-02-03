@@ -7,6 +7,7 @@ urlpatterns = [
     # register
     path("register/", views.RegisterAPIView.as_view(), name="register"),
     path("email-activation/<uidb64>/<token>/", views.ActivateEmailAPIView.as_view(), name="email-activation"),
+    path("send-email-activation/", views.SendActivationEmailAPIView.as_view(), name="send-activation-email"),
     #login
     path("login/", views.MyTokenObtainPairView.as_view(), name="token-obtain-pair"),
     path("refresh/", TokenRefreshView.as_view(), name="token-refresh"),

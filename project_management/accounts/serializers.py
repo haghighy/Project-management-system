@@ -50,10 +50,25 @@ class UserRegisterSerializer(serializers.ModelSerializer):
 
 class UserSerializerWithToken(serializers.Serializer):
     """
-    Serializer to include JWT access and refresh tokens with user data.
+    Serializer that returns JWT tokens if the email is verified,
+    otherwise, it returns only email verification status and email address.
     """
     access = serializers.SerializerMethodField()
     refresh = serializers.SerializerMethodField()
+    email_verified = serializers.SerializerMethodField()
+    email_address = serializers.SerializerMethodField()
+
+    def to_representation(self, obj):
+        print(obj.profile.email_verified)
+        if obj.profile.email_verified:
+            return {
+                "access": self.get_access(obj),
+                "refresh": self.get_refresh(obj)
+            }
+        return {
+            "email_verified": obj.profile.email_verified,
+            "email_address": obj.email_address
+        }
 
     def get_access(self, obj):
         token = RefreshToken.for_user(obj)
@@ -62,6 +77,12 @@ class UserSerializerWithToken(serializers.Serializer):
     def get_refresh(self, obj):
         token = RefreshToken.for_user(obj)
         return str(token)
+
+    def get_email_verified(self, obj):
+        return obj.profile.email_verified
+
+    def get_email_address(self, obj):
+        return obj.email_address
 
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
