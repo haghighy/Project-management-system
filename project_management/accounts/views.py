@@ -66,7 +66,7 @@ class ActivateEmailAPIView(APIView):
 
             if default_token_generator.check_token(user, token):
                 user.profile.email_verified = True
-                user.save()
+                user.profile.save()
                 return Response({"message": "Account activated successfully."}, status=status.HTTP_200_OK)
 
             return Response({"error": "Invalid or expired token."}, status=status.HTTP_400_BAD_REQUEST)
