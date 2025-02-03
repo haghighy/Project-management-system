@@ -7,7 +7,8 @@ class Notification(models.Model):
     recipient = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="notifications")
     actor = models.ForeignKey(Member, on_delete=models.CASCADE, related_name="notifications_sent")
     board = models.ForeignKey(Board, on_delete=models.CASCADE, null=True, blank=True)
-    card = models.ForeignKey(Card, on_delete=models.CASCADE, null=True, blank=True)  # "card_assigned", "comment", etc.
+    card = models.ForeignKey(Card, on_delete=models.CASCADE, null=True, blank=True)  
+    type = models.CharField(max_length=255, default=None)
     message = models.TextField()
     is_read = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
