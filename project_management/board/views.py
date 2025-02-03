@@ -62,8 +62,8 @@ class RemoveMemberFromBoardAPIView(APIView):
     permission_classes = [IsAuthenticated]
 
     def delete(self, request, *args, **kwargs):
-        board = Board.objects.get(id=kwargs["board_id"])
-        member = BoardMember.objects.get(board=board, member=request.user)
+        user_id = request.user.id
+        member = BoardMember.objects.get(board__id=kwargs["board_id"], member__user__id=user_id)
         member.delete()
         return Response({"message": "Member removed successfully."}, status=status.HTTP_204_NO_CONTENT)
 
@@ -77,7 +77,10 @@ class ChangeMemberTypeAPIView(APIView):
 
     def put(self, request, *args, **kwargs):
         board = Board.objects.get(id=kwargs["board_id"])
-        member = BoardMember.objects.get(board=board, member=request.user)
+        mem = Member.objects.get(user__id = request.user.id)
+        print(mem.id)
+        print(board.id)
+        member = BoardMember.objects.get(board__id=board.id, member__id=mem.id)
         member.member_type = request.data.get("member_type")
         member.save()
         return Response({"message": "Member type updated successfully."}, status=status.HTTP_200_OK)

@@ -33,7 +33,7 @@ class BoardMember(models.Model):
     unconfirmed = models.BooleanField(default=True)
 
     def __str__(self):
-        return f"{self.member.full_name} in {self.board.board_title}"
+        return f"{self.member.full_name} in {self.board.title}"
     
 class BoardAction(models.Model):
     board = models.ForeignKey(Board, on_delete=models.CASCADE, related_name="actions")
