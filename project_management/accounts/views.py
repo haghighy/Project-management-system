@@ -3,10 +3,11 @@ from django.contrib.auth.tokens import default_token_generator
 from django.contrib.auth import get_user_model
 from rest_framework.views import APIView
 from rest_framework import status
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .serializers import UserRegisterSerializer
+from .serializers import UserRegisterSerializer, MyTokenObtainPairSerializer
 from .utils import activation_mail, Util
 
 User = get_user_model()
@@ -19,9 +20,10 @@ class RegisterAPIView(APIView):
     """
 
     permission_classes = [AllowAny]
+    serializer_class = UserRegisterSerializer
 
     def post(self, request, *args, **kwargs):
-        serializer = UserRegisterSerializer(data=request.data)
+        serializer = self.serializer_class(data=request.data)
         
         if serializer.is_valid():
             user = serializer.save()
@@ -64,3 +66,11 @@ class ActivateEmailAPIView(APIView):
 
         except (User.DoesNotExist, ValueError):
             return Response({"error": "Invalid activation link."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+class MyTokenObtainPairView(TokenObtainPairView):
+    """
+    This endpoint takes a username(or email) and password and returns an access and a refresh JSON web token pair.
+    """
+
+    serializer_class = MyTokenObtainPairSerializer
