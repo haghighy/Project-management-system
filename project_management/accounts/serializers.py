@@ -161,3 +161,32 @@ class UserProfileSerializer(serializers.ModelSerializer):
         instance.save()
         member.save()
         return instance
+    
+    
+from django.contrib.auth.password_validation import validate_password as django_validate_password
+from rest_framework import serializers
+
+class ChangePasswordSerializer(serializers.Serializer):
+    """
+    Serializer for changing user password.
+    """
+
+    old_password = serializers.CharField(write_only=True)
+    new_password = serializers.CharField(write_only=True, validators=[django_validate_password])
+    new_password2 = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        """
+        Ensure `new_password` and `new_password2` match.
+        """
+        new_password = data.get("new_password")
+        new_password2 = data.get("new_password2")
+        
+        missing_fields = [field for field in ["old_password", "new_password", "new_password2"] if not data.get(field)]
+        if missing_fields:
+            raise exceptions.ValidationError({field: "This field is required." for field in missing_fields})
+
+        if new_password != new_password2:
+            raise serializers.ValidationError({"new_password2": "New passwords must match."})
+
+        return data

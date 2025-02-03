@@ -17,4 +17,6 @@ urlpatterns = [
     #profile
     path('profile/', views.RetrieveUserProfileAPIView.as_view(), name='get-profile'),
     path('profile/update/', views.UpdateUserProfileAPIView.as_view(), name='update-profile'),
+    #change password
+    path('change-password/', views.ChangePasswordAPIView.as_view(), name='change-password'),
 ]

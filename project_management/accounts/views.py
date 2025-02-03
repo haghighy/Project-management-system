@@ -13,6 +13,7 @@ from .serializers import (
     RequestResetPasswordSerializer,
     ResetPasswordSerializer,
     UserProfileSerializer,
+    ChangePasswordSerializer,
 )
 from .utils import activation_mail, reset_password_mail, Util
 
@@ -163,5 +164,30 @@ class UpdateUserProfileAPIView(APIView):
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    
+class ChangePasswordAPIView(APIView):
+    """
+    This endpoint allows authenticated users to change their password.
+    """
+
+    permission_classes = [IsAuthenticated]
+    serializer_class = ChangePasswordSerializer
+
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data, partial=True)
+        if serializer.is_valid():
+            user = request.user
+            old_password = serializer.validated_data.get("old_password")
+
+            if not user.check_password(old_password):
+                return Response({"old_password": "Incorrect old password."}, status=status.HTTP_400_BAD_REQUEST)
+
+            user.set_password(serializer.validated_data["new_password"])
+            user.save()
+
+            return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
